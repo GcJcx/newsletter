@@ -74,7 +74,7 @@ function App() {
       
       {/* TradixAI Logo - Top Left */}
       <div className="absolute top-6 left-6 z-20">
-        <div className="flex items-center space-x-2 bg-slate-800/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50">
+        <div className="flex items-center space-x-2 bg-purple-800/30 backdrop-blur-sm px-4 py-2 rounded-lg border border-purple-600/30">
           <Zap className="w-5 h-5 text-blue-400" />
           <span className="text-white font-semibold text-lg">TradixAI</span>
         </div>
