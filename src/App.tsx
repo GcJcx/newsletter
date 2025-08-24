@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Check, AlertCircle, Loader2, Zap } from 'lucide-react';
 import { supabase } from './lib/supabase';
 
 function App() {
@@ -72,6 +72,14 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-800/20 to-indigo-800/20"></div>
       
+      {/* TradixAI Logo - Top Left */}
+      <div className="absolute top-6 left-6 z-20">
+        <div className="flex items-center space-x-2 bg-slate-800/90 backdrop-blur-sm px-4 py-2 rounded-lg border border-slate-700/50">
+          <Zap className="w-5 h-5 text-blue-400" />
+          <span className="text-white font-semibold text-lg">TradixAI</span>
+        </div>
+      </div>
+
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-20 left-20 w-64 h-64 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
