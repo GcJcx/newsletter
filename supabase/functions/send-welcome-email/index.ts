@@ -1,20 +1,22 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    console.log('Welcome email function called')
+    
     const { email } = await req.json()
+    console.log('Email received:', email)
 
     if (!email) {
+      console.error('No email provided')
       return new Response(
         JSON.stringify({ error: 'Email is required' }),
         { 
@@ -24,19 +26,22 @@ serve(async (req) => {
       )
     }
 
-    // Send email using Resend API
+    // Check if Resend API key exists
     const resendApiKey = Deno.env.get('RESEND_API_KEY')
+    console.log('Resend API key exists:', !!resendApiKey)
     
     if (!resendApiKey) {
-      console.error('RESEND_API_KEY not found')
+      console.error('RESEND_API_KEY environment variable not found')
       return new Response(
-        JSON.stringify({ error: 'Email service not configured' }),
+        JSON.stringify({ error: 'Email service not configured - missing API key' }),
         { 
           status: 500, 
           headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
         }
       )
     }
+
+    console.log('Attempting to send email via Resend API...')
 
     const emailResponse = await fetch('https://api.resend.com/emails', {
       method: 'POST',
@@ -47,7 +52,7 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'TradixAI <noreply@tradixai.com>',
         to: [email],
-        subject: 'Welcome to TradixAI Newsletter!',
+        subject: 'Thank you for signing up to TradixAI newsletter',
         html: `
           <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: linear-gradient(135deg, #7c3aed, #3b82f6); padding: 30px; border-radius: 10px; text-align: center; margin-bottom: 30px;">
@@ -89,17 +94,34 @@ serve(async (req) => {
       }),
     })
 
+    console.log('Resend API response status:', emailResponse.status)
+
     if (!emailResponse.ok) {
       const errorData = await emailResponse.text()
-      console.error('Resend API error:', errorData)
-      throw new Error('Failed to send email')
+      console.error('Resend API error response:', errorData)
+      
+      return new Response(
+        JSON.stringify({ 
+          error: 'Failed to send email', 
+          details: errorData,
+          status: emailResponse.status 
+        }),
+        { 
+          status: 500, 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+        }
+      )
     }
 
     const emailData = await emailResponse.json()
     console.log('Email sent successfully:', emailData)
 
     return new Response(
-      JSON.stringify({ success: true, message: 'Welcome email sent successfully' }),
+      JSON.stringify({ 
+        success: true, 
+        message: 'Welcome email sent successfully',
+        emailId: emailData.id 
+      }),
       { 
         status: 200, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
@@ -109,7 +131,10 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in send-welcome-email function:', error)
     return new Response(
-      JSON.stringify({ error: 'Internal server error' }),
+      JSON.stringify({ 
+        error: 'Internal server error', 
+        details: error.message 
+      }),
       { 
         status: 500, 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
