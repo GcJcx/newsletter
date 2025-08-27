@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'TradixAI <noreply@tradixai.com>',
+        from: 'TradixAI <onboarding@resend.dev>',
         to: [email],
         subject: 'Thank you for signing up to TradixAI newsletter',
         html: `
