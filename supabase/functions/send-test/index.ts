@@ -1,15 +1,4 @@
-/*
-  # Send Test Email Function
-
-  This edge function:
-  1. Fetches the most recent email from newsletter_signups table
-  2. Sends a test email to that address using Resend
-  3. Returns success/error status
-
-  Route: /functions/v1/send-test
-*/
-
-import { createClient } from 'npm:@supabase/supabase-js@2.56.0';
+import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,20 +7,36 @@ const corsHeaders = {
 };
 
 Deno.serve(async (req: Request) => {
-  // Handle CORS preflight requests
-  if (req.method === "OPTIONS") {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
-  }
-
   try {
-    // Initialize Supabase client with service role key for database access
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    );
+    // Handle CORS preflight requests
+    if (req.method === "OPTIONS") {
+      return new Response(null, {
+        status: 200,
+        headers: corsHeaders,
+      });
+    }
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseServiceKey) {
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'Supabase configuration missing' 
+        }),
+        {
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders 
+          }
+        }
+      );
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Fetch the most recent email from newsletter_signups
     const { data: signups, error: dbError } = await supabase
@@ -43,7 +48,19 @@ Deno.serve(async (req: Request) => {
 
     if (dbError) {
       console.error('Database error:', dbError);
-      throw new Error(`Database error: ${dbError.message}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Database error: ${dbError.message}` 
+        }),
+        {
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders 
+          }
+        }
+      );
     }
 
     if (!signups || signups.length === 0) {
@@ -65,17 +82,17 @@ Deno.serve(async (req: Request) => {
     const mostRecentEmail = signups[0].email;
     console.log('Sending test email to:', mostRecentEmail);
 
-    // Send email using Resend
+    // Check for Resend API key
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
     
     if (!resendApiKey) {
       return new Response(
         JSON.stringify({ 
           success: false, 
-          error: 'Resend API key not configured. Please add RESEND_API_KEY to your environment variables.' 
+          error: 'Resend API key not configured. Please add RESEND_API_KEY to your Supabase environment variables.' 
         }),
         {
-          status: 500,
+          status: 400,
           headers: { 
             'Content-Type': 'application/json',
             ...corsHeaders 
@@ -84,17 +101,18 @@ Deno.serve(async (req: Request) => {
       );
     }
 
+    // Send email using Resend
     const emailData = {
-      from: 'TradixAI <noreply@yourdomain.com>', // You'll need to update this with your verified domain
+      from: 'TradixAI <noreply@tradixai.com>',
       to: [mostRecentEmail],
       subject: 'Test Email from TradixAI',
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
-          <h1 style="color: #7c3aed; text-align: center;">TradixAI</h1>
-          <p style="font-size: 16px; line-height: 1.6; color: #333;">
+          <h1 style="color: #7c3aed; text-align: center; margin-bottom: 30px;">TradixAI</h1>
+          <p style="font-size: 16px; line-height: 1.6; color: #333; margin-bottom: 20px;">
             This is a test email from my Bolt app.
           </p>
-          <p style="font-size: 14px; color: #666; margin-top: 30px;">
+          <p style="font-size: 14px; color: #666; margin-top: 30px; text-align: center;">
             You received this email because you signed up for our newsletter.
           </p>
         </div>
@@ -115,7 +133,19 @@ Deno.serve(async (req: Request) => {
 
     if (!resendResponse.ok) {
       console.error('Resend error:', resendResult);
-      throw new Error(`Email sending failed: ${resendResult.message || 'Unknown error'}`);
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: `Email sending failed: ${resendResult.message || 'Unknown error'}` 
+        }),
+        {
+          status: 500,
+          headers: { 
+            'Content-Type': 'application/json',
+            ...corsHeaders 
+          }
+        }
+      );
     }
 
     console.log('Email sent successfully:', resendResult);
