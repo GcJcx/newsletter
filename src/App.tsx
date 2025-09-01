@@ -11,6 +11,10 @@ function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    console.log('Form submitted with email:', email);
+    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
+    console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
+    
     if (!email || !email.includes('@')) {
       setMessage('Please enter a valid email address');
       setIsSuccess(false);
@@ -21,6 +25,8 @@ function App() {
     setMessage('');
 
     try {
+      console.log('Attempting to insert email:', email.toLowerCase().trim());
+      
       const { error } = await supabase
         .from('newsletter_signups')
         .insert([
@@ -30,15 +36,19 @@ function App() {
           }
         ]);
 
+      console.log('Supabase response error:', error);
+
       if (error) {
         if (error.code === '23505') {
           // Duplicate email
           setMessage('You\'re already signed up! Thanks for your interest.');
           setIsSuccess(true);
         } else {
+          console.error('Supabase error details:', error);
           throw error;
         }
       } else {
+        console.log('Email successfully inserted!');
         setMessage('Thanks for signing up! We\'ll notify you when we launch.');
         setIsSuccess(true);
         setEmail('');
