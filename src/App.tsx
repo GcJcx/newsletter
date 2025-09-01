@@ -53,25 +53,25 @@ function App() {
       } else {
         setStatus('success');
         setMessage('Thank you! You\'ve been added to our newsletter.');
-      }
-      
-      // Send welcome email after successful signup
-      try {
-        const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome-email`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email: email.toLowerCase().trim() }),
-        });
         
-        if (!emailResponse.ok) {
-          console.warn('Failed to send welcome email, but signup was successful');
+        // Send welcome email
+        try {
+          const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome-email`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email: email.toLowerCase().trim() }),
+          });
+          
+          if (!emailResponse.ok) {
+            console.warn('Failed to send welcome email, but signup was successful');
+          }
+        } catch (emailError) {
+          console.warn('Error sending welcome email:', emailError);
+          // Don't change the success status - signup was still successful
         }
-      } catch (emailError) {
-        console.warn('Error sending welcome email:', emailError);
-        // Don't change the success status - signup was still successful
       }
       
       setEmail('');
