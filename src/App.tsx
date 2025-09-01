@@ -57,6 +57,7 @@ function App() {
       
       // Send welcome email for both new signups and existing subscribers
       try {
+        console.log('Attempting to send welcome email...');
         const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome-email`, {
           method: 'POST',
           headers: {
@@ -65,6 +66,10 @@ function App() {
           },
           body: JSON.stringify({ email: email.toLowerCase().trim() }),
         });
+        
+        console.log('Email response status:', emailResponse.status);
+        const emailResult = await emailResponse.text();
+        console.log('Email response:', emailResult);
         
         if (!emailResponse.ok) {
           console.warn('Failed to send welcome email, but signup was successful');
