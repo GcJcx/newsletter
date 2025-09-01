@@ -8,11 +8,3 @@ if (!supabaseUrl || !supabaseAnonKey) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
-
-export type NewsletterSignup = {
-  id: string;
-  email: string;
-  created_at: string;
-  subscribed: boolean;
-  source: string;
-};
