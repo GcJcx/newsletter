@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Mail, Check, AlertCircle, Loader2, Zap, X } from 'lucide-react';
-import { supabase } from './lib/supabase';
+'use client';
 
-function App() {
+import React, { useState } from 'react';
+import { Mail, Check, AlertCircle, Loader2, X } from 'lucide-react';
+
+function HomePage() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -32,53 +33,27 @@ function App() {
     setStatus('loading');
     
     try {
-      // Insert email into Supabase
-      const { error } = await supabase
-        .from('newsletter_signups')
-        .insert([
-          { 
-            email: email.toLowerCase().trim(),
-            source: 'coming_soon_page'
-          }
-        ]);
+      const response = await fetch('/api/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email: email.toLowerCase().trim() }),
+      });
 
-      if (error) {
-        // Handle duplicate email error gracefully
-        if (error.code === '23505') {
-          setStatus('success');
-          setMessage('You\'re already subscribed! Thanks for your interest.');
-        } else {
-          throw error;
-        }
-      } else {
-        setStatus('success');
-        setMessage('Thank you! You\'ve been added to our newsletter.');
-        
-        // Send welcome email
-        try {
-          const emailResponse = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-welcome-email`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email: email.toLowerCase().trim() }),
-          });
-          
-          if (!emailResponse.ok) {
-            console.warn('Failed to send welcome email, but signup was successful');
-          }
-        } catch (emailError) {
-          console.warn('Error sending welcome email:', emailError);
-          // Don't change the success status - signup was still successful
-        }
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
       }
-      
+
+      setStatus('success');
+      setMessage('Check your inbox! We\'ve sent you a confirmation email.');
       setEmail('');
     } catch (error) {
       console.error('Newsletter signup error:', error);
       setStatus('error');
-      setMessage('Something went wrong. Please try again.');
+      setMessage(error instanceof Error ? error.message : 'Something went wrong. Please try again.');
     }
   };
 
@@ -121,86 +96,84 @@ function App() {
 
         {/* Main Content */}
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
-          <div className="text-center mb-8">
-            <h2 className="text-2xl font-semibold text-white mb-4">
-              Get Early Access
-            </h2>
-            <p className="text-purple-200 leading-relaxed">
-              Be the first to know when we launch. Join our newsletter for exclusive updates and early bird access.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  resetStatus();
-                }}
-                placeholder="Enter your email address"
-                className={`w-full px-4 py-4 bg-white/20 backdrop-blur-sm border rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 transition-all duration-300 ${
-                  status === 'error' 
-                    ? 'border-red-400 focus:ring-red-400' 
-                    : 'border-white/30 focus:ring-purple-400 focus:border-purple-400'
-                }`}
-                disabled={status === 'loading' || status === 'success'}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={status === 'loading' || status === 'success'}
-              className={`w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all duration-300 transform ${
-                status === 'success'
-                  ? 'bg-green-500 hover:bg-green-600'
-                  : status === 'loading'
-                  ? 'bg-purple-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 hover:scale-105 hover:shadow-lg'
-              } disabled:transform-none disabled:hover:scale-100`}
-            >
-              <div className="flex items-center justify-center space-x-2">
-                {status === 'loading' && <Loader2 className="w-5 h-5 animate-spin" />}
-                {status === 'success' && <Check className="w-5 h-5" />}
-                <span>
-                  {status === 'loading' 
-                    ? 'Subscribing...' 
-                    : status === 'success' 
-                    ? 'Subscribed!' 
-                    : 'Notify Me'
-                  }
-                </span>
+          {status === 'success' ? (
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-6">
+                <Check className="w-8 h-8 text-green-400" />
               </div>
-            </button>
-          </form>
-
-          {/* Status Messages */}
-          {message && (
-            <div className={`mt-4 p-4 rounded-xl flex items-center space-x-2 ${
-              status === 'success' 
-                ? 'bg-green-500/20 border border-green-400/30' 
-                : 'bg-red-500/20 border border-red-400/30'
-            }`}>
-              {status === 'success' ? (
-                <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-              ) : (
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-              )}
-              <p className={`text-sm ${
-                status === 'success' ? 'text-green-200' : 'text-red-200'
-              }`}>
+              <h2 className="text-2xl font-semibold text-white mb-4">
+                You're All Set!
+              </h2>
+              <p className="text-green-200 leading-relaxed">
                 {message}
               </p>
             </div>
-          )}
+          ) : (
+            <>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-semibold text-white mb-4">
+                  Get Early Access
+                </h2>
+                <p className="text-purple-200 leading-relaxed">
+                  Be the first to know when we launch. Join our newsletter for exclusive updates and early bird access.
+                </p>
+              </div>
 
-          {/* Social Proof */}
-          <div className="mt-8 text-center">
-            <p className="text-purple-300 text-sm">
-              Join <span className="font-semibold text-white">2,847</span> others waiting for launch
-            </p>
-          </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      resetStatus();
+                    }}
+                    placeholder="Enter your email address"
+                    className={`w-full px-4 py-4 bg-white/20 backdrop-blur-sm border rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 transition-all duration-300 ${
+                      status === 'error' 
+                        ? 'border-red-400 focus:ring-red-400' 
+                        : 'border-white/30 focus:ring-purple-400 focus:border-purple-400'
+                    }`}
+                    disabled={status === 'loading'}
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  className={`w-full py-4 px-6 rounded-2xl font-semibold text-white transition-all duration-300 transform ${
+                    status === 'loading'
+                      ? 'bg-purple-500 cursor-not-allowed'
+                      : 'bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 hover:scale-105 hover:shadow-lg'
+                  } disabled:transform-none disabled:hover:scale-100`}
+                >
+                  <div className="flex items-center justify-center space-x-2">
+                    {status === 'loading' && <Loader2 className="w-5 h-5 animate-spin" />}
+                    <span>
+                      {status === 'loading' ? 'Subscribing...' : 'Notify Me'}
+                    </span>
+                  </div>
+                </button>
+              </form>
+
+              {/* Error Messages */}
+              {status === 'error' && message && (
+                <div className="mt-4 p-4 rounded-xl flex items-center space-x-2 bg-red-500/20 border border-red-400/30">
+                  <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                  <p className="text-sm text-red-200">
+                    {message}
+                  </p>
+                </div>
+              )}
+
+              {/* Social Proof */}
+              <div className="mt-8 text-center">
+                <p className="text-purple-300 text-sm">
+                  Join <span className="font-semibold text-white">2,847</span> others waiting for launch
+                </p>
+              </div>
+            </>
+          )}
         </div>
 
         {/* Footer */}
@@ -353,4 +326,4 @@ function App() {
   );
 }
 
-export default App;
+export default HomePage;
