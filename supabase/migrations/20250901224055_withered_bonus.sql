@@ -11,7 +11,7 @@
 
   2. Security
     - Enable RLS on `newsletter_signups` table
-    - Add policy for anonymous users to insert newsletter signups
+    - Add policy for anonymous users to insert signups
     - Add policy for authenticated users to view signups
 
   3. Indexes
@@ -31,19 +31,20 @@ CREATE TABLE IF NOT EXISTS newsletter_signups (
 -- Enable Row Level Security
 ALTER TABLE newsletter_signups ENABLE ROW LEVEL SECURITY;
 
--- Create indexes for performance
-CREATE INDEX IF NOT EXISTS newsletter_signups_email_idx ON newsletter_signups (email);
-CREATE INDEX IF NOT EXISTS newsletter_signups_created_at_idx ON newsletter_signups (created_at DESC);
-
--- Create RLS policies
+-- Policy: Allow anonymous users to sign up for newsletter
 CREATE POLICY "Anyone can sign up for newsletter"
   ON newsletter_signups
   FOR INSERT
   TO anon, authenticated
   WITH CHECK (true);
 
+-- Policy: Allow authenticated users to view signups
 CREATE POLICY "Authenticated users can view signups"
   ON newsletter_signups
   FOR SELECT
   TO authenticated
   USING (true);
+
+-- Create indexes for better performance
+CREATE INDEX IF NOT EXISTS newsletter_signups_email_idx ON newsletter_signups (email);
+CREATE INDEX IF NOT EXISTS newsletter_signups_created_at_idx ON newsletter_signups (created_at DESC);
