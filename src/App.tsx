@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Zap } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { TestEmailButton } from './components/TestEmailButton';
 
 function App() {
   const [email, setEmail] = useState('');
@@ -151,6 +152,8 @@ function App() {
           </p>
         </div>
       </div>
+      
+      <TestEmailButton />
     </div>
   );
 }
