@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
-import { Zap } from 'lucide-react';
+import { Zap, Settings } from 'lucide-react';
 import { supabase } from './lib/supabase';
+import { AdminPanel } from './components/AdminPanel';
 
 function App() {
   const [email, setEmail] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  if (showAdmin) {
+    return <AdminPanel />;
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -70,6 +76,15 @@ function App() {
       <div className="absolute top-6 left-6 z-20">
         <span className="text-white font-semibold text-lg">TradixAI</span>
       </div>
+
+      {/* Admin Button - Top Right */}
+      <button
+        onClick={() => setShowAdmin(true)}
+        className="absolute top-6 right-6 z-20 flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all"
+      >
+        <Settings className="w-4 h-4" />
+        Admin
+      </button>
 
       {/* Background Pattern */}
       <div className="absolute inset-0 opacity-10">
