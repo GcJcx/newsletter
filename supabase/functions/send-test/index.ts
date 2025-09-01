@@ -85,7 +85,7 @@ Deno.serve(async (req: Request) => {
     }
 
     const emailData = {
-      from: 'TradixAI <noreply@yourdomain.com>', // You'll need to update this with your verified domain
+      from: 'onboarding@resend.dev', // Using Resend's verified domain for testing
       to: [mostRecentEmail],
       subject: 'Test Email from TradixAI',
       html: `
@@ -114,8 +114,12 @@ Deno.serve(async (req: Request) => {
     const resendResult = await resendResponse.json();
 
     if (!resendResponse.ok) {
-      console.error('Resend error:', resendResult);
-      throw new Error(`Email sending failed: ${resendResult.message || 'Unknown error'}`);
+      console.error('Resend API error:', {
+        status: resendResponse.status,
+        statusText: resendResponse.statusText,
+        error: resendResult
+      });
+      throw new Error(`Email sending failed: ${resendResult.message || resendResult.error || 'Unknown error'}`);
     }
 
     console.log('Email sent successfully:', resendResult);
