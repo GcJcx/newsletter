@@ -59,7 +59,7 @@ function App() {
           </div>
 
           {/* MailerLite Embedded Form */}
-          <div className="ml-embedded" data-form="YourFormId">
+          <div className="ml-embedded" data-form="0MvpiC">
             {/* Fallback form while MailerLite loads */}
             <div className="space-y-6">
               <div className="relative">
