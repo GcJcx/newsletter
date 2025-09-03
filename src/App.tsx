@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Zap } from 'lucide-react';
 
 function App() {
   return (
