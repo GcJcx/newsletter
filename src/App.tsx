@@ -2,6 +2,37 @@ import React, { useEffect } from 'react';
 import { Zap } from 'lucide-react';
 
 function App() {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    const email = formData.get('fields[email]') as string;
+    
+    if (!email) return;
+    
+    try {
+      // Submit to MailerLite
+      const response = await fetch('https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe', {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors' // Required for cross-origin requests
+      });
+      
+      // Show success message
+      const successDiv = document.querySelector('.ml-form-successBody') as HTMLElement;
+      const formDiv = document.querySelector('.row-form') as HTMLElement;
+      
+      if (successDiv && formDiv) {
+        formDiv.style.display = 'none';
+        successDiv.style.display = 'block';
+      }
+    } catch (error) {
+      console.error('Subscription error:', error);
+      // You could add error handling here
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-800/20 to-indigo-800/20"></div>
@@ -48,7 +79,7 @@ function App() {
             <div className="ml-form-align-center">
               <div className="ml-form-embedWrapper embedForm">
                 <div className="ml-form-embedBody ml-form-embedBodyDefault row-form">
-                  <form className="ml-block-form" action="https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe" data-code="" method="post" target="_blank">
+                  <form className="ml-block-form" onSubmit={handleSubmit} data-code="" method="post">
                     <div className="ml-form-formContent">
                       <div className="ml-form-fieldRow ml-last-item">
                         <div className="ml-field-group ml-field-email ml-validate-email ml-validate-required">
@@ -77,8 +108,8 @@ function App() {
                 </div>
                 <div className="ml-form-successBody row-success" style={{display: 'none'}}>
                   <div className="ml-form-successContent">
-                    <h4>Thank you!</h4>
-                    <p>You have successfully joined our subscriber list.</p>
+                    <h4 className="text-white text-xl font-semibold mb-2">Thank you!</h4>
+                    <p className="text-purple-200">You have successfully joined our subscriber list.</p>
                   </div>
                 </div>
               </div>
