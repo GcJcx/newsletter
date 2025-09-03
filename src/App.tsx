@@ -1,22 +1,6 @@
 import React, { useEffect } from 'react';
-import { Zap } from 'lucide-react';
 
 function App() {
-  useEffect(() => {
-    // Load MailerLite script
-    const script = document.createElement('script');
-    script.src = 'https://static.mailerlite.com/js/w/webforms.min.js?v0c75f831c56857441820dcec3163967c';
-    script.async = true;
-    document.head.appendChild(script);
-
-    return () => {
-      // Cleanup script on unmount
-      if (document.head.contains(script)) {
-        document.head.removeChild(script);
-      }
-    };
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-800/20 to-indigo-800/20"></div>
@@ -80,11 +64,6 @@ function App() {
           </div>
 
           {/* Social Proof */}
-          <div className="mt-8 text-center">
-            <p className="text-purple-300 text-sm">
-              Join <span className="font-semibold text-white">2,847</span> others waiting for launch
-            </p>
-          </div>
         </div>
 
         {/* Footer */}
