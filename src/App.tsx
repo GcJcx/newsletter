@@ -44,7 +44,69 @@ function App() {
           </div>
 
           {/* MailerLite Embedded Form */}
-          <div className="ml-embedded" data-form="0MvpiC">
+          <div id="mlb2-30465305" className="ml-form-embedContainer ml-subscribe-form ml-subscribe-form-30465305">
+            <div className="ml-form-align-center">
+              <div className="ml-form-embedWrapper embedForm">
+                <div className="ml-form-embedBody ml-form-embedBodyDefault row-form">
+                  <form className="ml-block-form" action="https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe" data-code="" method="post" target="_blank">
+                    <div className="ml-form-formContent">
+                      <div className="ml-form-fieldRow ml-last-item">
+                        <div className="ml-field-group ml-field-email ml-validate-email ml-validate-required">
+                          <input 
+                            aria-label="email" 
+                            aria-required="true" 
+                            type="email" 
+                            className="form-control" 
+                            name="fields[email]" 
+                            placeholder="Enter your email address" 
+                            autoComplete="email"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <input type="hidden" name="ml-submit" value="1" />
+                    <div className="ml-form-embedSubmit">
+                      <button type="submit" className="primary">Get Early Access</button>
+                      <button disabled style={{display: 'none'}} type="button" className="loading">
+                        <div className="ml-form-embedSubmitLoad"></div>
+                        <span className="sr-only">Loading...</span>
+                      </button>
+                    </div>
+                    <input type="hidden" name="anticsrf" value="true" />
+                  </form>
+                </div>
+                <div className="ml-form-successBody row-success" style={{display: 'none'}}>
+                  <div className="ml-form-successContent">
+                    <h4>Thank you!</h4>
+                    <p>You have successfully joined our subscriber list.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-6">
+          <p className="text-purple-300 text-sm">
+            No spam, ever. Unsubscribe with one click.
+          </p>
+        </div>
+      </div>
+
+      {/* MailerLite Success Script */}
+      <script dangerouslySetInnerHTML={{
+        __html: `
+          function ml_webform_success_30465305() {
+            var $ = ml_jQuery || jQuery;
+            $('.ml-subscribe-form-30465305 .row-success').show();
+            $('.ml-subscribe-form-30465305 .row-form').hide();
+          }
+        `
+      }} />
+    </div>
+  );
+}
             {/* Fallback form while MailerLite loads */}
             <div className="space-y-6">
               <div className="relative">
