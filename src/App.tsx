@@ -2,6 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 
 function App() {
+  useEffect(() => {
+    // Ensure MailerLite script is loaded and form is rendered
+    const checkMailerLite = () => {
+      if (window.ml) {
+        window.ml('account', '1776947');
+      } else {
+        setTimeout(checkMailerLite, 100);
+      }
+    };
+    checkMailerLite();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-800/20 to-indigo-800/20"></div>
