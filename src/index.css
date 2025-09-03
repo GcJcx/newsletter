@@ -1,3 +1,64 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* MailerLite Form Styling */
+.ml-embedded input[type="email"] {
+  width: 100% !important;
+  padding: 16px !important;
+  background: rgba(255, 255, 255, 0.2) !important;
+  backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 16px !important;
+  color: white !important;
+  font-size: 16px !important;
+  transition: all 0.3s ease !important;
+}
+
+.ml-embedded input[type="email"]::placeholder {
+  color: rgba(196, 181, 253, 1) !important;
+}
+
+.ml-embedded input[type="email"]:focus {
+  outline: none !important;
+  ring: 2px solid rgba(147, 51, 234, 1) !important;
+  border-color: rgba(147, 51, 234, 1) !important;
+}
+
+.ml-embedded button[type="submit"] {
+  width: 100% !important;
+  padding: 16px 24px !important;
+  border-radius: 16px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  background: linear-gradient(to right, rgb(147, 51, 234), rgb(79, 70, 229)) !important;
+  border: none !important;
+  transition: all 0.3s ease !important;
+  transform: scale(1) !important;
+  cursor: pointer !important;
+}
+
+.ml-embedded button[type="submit"]:hover {
+  background: linear-gradient(to right, rgb(126, 34, 206), rgb(67, 56, 202)) !important;
+  transform: scale(1.05) !important;
+}
+
+.ml-embedded .ml-form-successBody {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border: 1px solid rgba(34, 197, 94, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  color: rgb(187, 247, 208) !important;
+  text-align: center !important;
+  margin-top: 16px !important;
+}
+
+.ml-embedded .ml-form-errorMessage {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border: 1px solid rgba(239, 68, 68, 0.3) !important;
+  border-radius: 16px !important;
+  padding: 16px !important;
+  color: rgb(252, 165, 165) !important;
+  text-align: center !important;
+  margin-top: 16px !important;
+}

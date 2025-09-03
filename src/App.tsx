@@ -1,67 +1,21 @@
-import React, { useState } from 'react';
+import React, { useEffect } from 'react';
 import { Zap } from 'lucide-react';
-import { supabase } from './lib/supabase';
-import { TestEmailButton } from './components/TestEmailButton';
 
 function App() {
-  const [email, setEmail] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [isSuccess, setIsSuccess] = useState(false);
+  useEffect(() => {
+    // Load MailerLite script
+    const script = document.createElement('script');
+    script.src = 'https://static.mailerlite.com/js/w/webforms.min.js?v0c75f831c56857441820dcec3163967c';
+    script.async = true;
+    document.head.appendChild(script);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    console.log('Form submitted with email:', email);
-    console.log('Supabase URL:', import.meta.env.VITE_SUPABASE_URL);
-    console.log('Supabase Key exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY);
-    
-    if (!email || !email.includes('@')) {
-      setMessage('Please enter a valid email address');
-      setIsSuccess(false);
-      return;
-    }
-
-    setIsLoading(true);
-    setMessage('');
-
-    try {
-      console.log('Attempting to insert email:', email.toLowerCase().trim());
-      
-      const { error } = await supabase
-        .from('newsletter_signups')
-        .insert([
-          {
-            email: email.toLowerCase().trim(),
-            source: 'coming_soon_page'
-          }
-        ]);
-
-      console.log('Supabase response error:', error);
-
-      if (error) {
-        if (error.code === '23505') {
-          // Duplicate email
-          setMessage('You\'re already signed up! Thanks for your interest.');
-          setIsSuccess(true);
-        } else {
-          console.error('Supabase error details:', error);
-          throw error;
-        }
-      } else {
-        console.log('Email successfully inserted!');
-        setMessage('Thanks for signing up! We\'ll notify you when we launch.');
-        setIsSuccess(true);
-        setEmail('');
+    return () => {
+      // Cleanup script on unmount
+      if (document.head.contains(script)) {
+        document.head.removeChild(script);
       }
-    } catch (error) {
-      console.error('Signup error:', error);
-      setMessage('Something went wrong. Please try again.');
-      setIsSuccess(false);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
@@ -104,38 +58,26 @@ function App() {
             </p>
           </div>
 
-          {/* Email Form - Placeholder for now */}
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="relative">
-              <input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all duration-300"
-                disabled={isLoading}
-              />
-            </div>
+          {/* MailerLite Embedded Form */}
+          <div className="ml-embedded" data-form="YourFormId">
+            {/* Fallback form while MailerLite loads */}
+            <div className="space-y-6">
+              <div className="relative">
+                <input
+                  type="email"
+                  placeholder="Enter your email address"
+                  className="w-full px-4 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all duration-300"
+                />
+              </div>
 
-            <button
-              type="submit"
-              disabled={isLoading || !email}
-              className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 disabled:from-gray-500 disabled:to-gray-600 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 disabled:hover:scale-100"
-            >
-              {isLoading ? 'Signing up...' : 'Get Early Access'}
-            </button>
-          </form>
-
-          {/* Success/Error Message */}
-          {message && (
-            <div className={`mt-4 p-4 rounded-2xl text-center ${
-              isSuccess 
-                ? 'bg-green-500/20 border border-green-400/30 text-green-200' 
-                : 'bg-red-500/20 border border-red-400/30 text-red-200'
-            }`}>
-              {message}
+              <button
+                type="submit"
+                className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
+              >
+                Get Early Access
+              </button>
             </div>
-          )}
+          </div>
 
           {/* Social Proof */}
           <div className="mt-8 text-center">
@@ -152,8 +94,6 @@ function App() {
           </p>
         </div>
       </div>
-      
-      <TestEmailButton />
     </div>
   );
 }
