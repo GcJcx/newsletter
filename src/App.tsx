@@ -45,16 +45,6 @@ function App() {
 
           {/* MailerLite Embedded Form */}
           <div className="ml-embedded" data-form="0WPiC"></div>
-                  <div className="ml-form-successContent">
-                    <h4 className="text-white text-xl font-semibold mb-2">Thank you!</h4>
-                    <p className="text-purple-200">You have successfully joined our subscriber list.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Social Proof */}
         </div>
 
         {/* Footer */}
