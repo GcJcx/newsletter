@@ -3,7 +3,8 @@
 @tailwind utilities;
 
 /* MailerLite Form Styling */
-.ml-embedded input[type="email"] {
+.ml-embedded input[type="email"],
+.ml-embedded input[type="text"] {
   width: 100% !important;
   padding: 16px !important;
   background: rgba(255, 255, 255, 0.2) !important;
@@ -13,15 +14,18 @@
   color: white !important;
   font-size: 16px !important;
   transition: all 0.3s ease !important;
+  margin-bottom: 16px !important;
 }
 
-.ml-embedded input[type="email"]::placeholder {
+.ml-embedded input[type="email"]::placeholder,
+.ml-embedded input[type="text"]::placeholder {
   color: rgba(196, 181, 253, 1) !important;
 }
 
-.ml-embedded input[type="email"]:focus {
+.ml-embedded input[type="email"]:focus,
+.ml-embedded input[type="text"]:focus {
   outline: none !important;
-  ring: 2px solid rgba(147, 51, 234, 1) !important;
+  box-shadow: 0 0 0 2px rgba(147, 51, 234, 1) !important;
   border-color: rgba(147, 51, 234, 1) !important;
 }
 
@@ -43,6 +47,11 @@
   transform: scale(1.05) !important;
 }
 
+.ml-embedded button[type="submit"]:disabled {
+  opacity: 0.5 !important;
+  transform: scale(1) !important;
+}
+
 .ml-embedded .ml-form-successBody {
   background: rgba(34, 197, 94, 0.2) !important;
   border: 1px solid rgba(34, 197, 94, 0.3) !important;
@@ -61,4 +70,15 @@
   color: rgb(252, 165, 165) !important;
   text-align: center !important;
   margin-top: 16px !important;
+}
+
+/* Hide MailerLite branding */
+.ml-embedded .ml-form-embedWrapper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.ml-embedded .ml-form-embedBody {
+  background: transparent !important;
+  padding: 0 !important;
 }
