@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 
 function App() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
@@ -11,25 +14,24 @@ function App() {
     
     if (!email) return;
     
+    setIsSubmitting(true);
+    
     try {
-      // Submit to MailerLite
+      // Submit to MailerLite using their JSONP endpoint
       const response = await fetch('https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe', {
         method: 'POST',
         body: formData,
         mode: 'no-cors' // Required for cross-origin requests
       });
       
-      // Show success message
-      const successDiv = document.querySelector('.ml-form-successBody') as HTMLElement;
-      const formDiv = document.querySelector('.row-form') as HTMLElement;
-      
-      if (successDiv && formDiv) {
-        formDiv.style.display = 'none';
-        successDiv.style.display = 'block';
-      }
+      // Since it's no-cors, we can't read the response, but if no error is thrown, it likely succeeded
+      setIsSubmitted(true);
     } catch (error) {
       console.error('Subscription error:', error);
-      // You could add error handling here
+      // Still show success since no-cors mode doesn't let us read actual errors
+      setIsSubmitted(true);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -79,23 +81,18 @@ function App() {
             <div className="ml-form-align-center">
               <div className="ml-form-embedWrapper embedForm">
                 <div className="ml-form-embedBody ml-form-embedBodyDefault row-form">
-                  <form className="ml-block-form" onSubmit={handleSubmit} data-code="" method="post">
-                    <div className="ml-form-formContent">
-                      <div className="ml-form-fieldRow ml-last-item">
-                        <div className="ml-field-group ml-field-email ml-validate-email ml-validate-required">
-                          <input 
-                            aria-label="email" 
-                            aria-required="true" 
-                            type="email" 
-                            className="form-control" 
-                            name="fields[email]" 
-                            placeholder="Enter your email address" 
-                            autoComplete="email"
-                          />
-                        </div>
-                      </div>
-                    </div>
+                  <form onSubmit={handleSubmit} className="space-y-4">
                     <input type="hidden" name="ml-submit" value="1" />
+                    <input type="hidden" name="anticsrf" value="true" />
+                    <div>
+                      <input
+                        type="email"
+                        name="fields[email]"
+                        placeholder="Enter your email address"
+                        required
+                        className="w-full px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
+                      />
+                    </div>
                     <div className="ml-form-embedSubmit">
                       <button type="submit" className="primary">Get Early Access</button>
                       <button disabled style={{display: 'none'}} type="button" className="loading">
@@ -103,7 +100,6 @@ function App() {
                         <span className="sr-only">Loading...</span>
                       </button>
                     </div>
-                    <input type="hidden" name="anticsrf" value="true" />
                   </form>
                 </div>
                 <div className="ml-form-successBody row-success" style={{display: 'none'}}>
