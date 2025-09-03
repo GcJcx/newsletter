@@ -2,39 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Zap } from 'lucide-react';
 
 function App() {
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    
-    const form = e.currentTarget;
-    const formData = new FormData(form);
-    const email = formData.get('fields[email]') as string;
-    
-    if (!email) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-      // Submit to MailerLite using their JSONP endpoint
-      const response = await fetch('https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe', {
-        method: 'POST',
-        body: formData,
-        mode: 'no-cors' // Required for cross-origin requests
-      });
-      
-      // Since it's no-cors, we can't read the response, but if no error is thrown, it likely succeeded
-      setIsSubmitted(true);
-    } catch (error) {
-      console.error('Subscription error:', error);
-      // Still show success since no-cors mode doesn't let us read actual errors
-      setIsSubmitted(true);
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-gradient-to-r from-purple-800/20 to-indigo-800/20"></div>
@@ -77,32 +44,7 @@ function App() {
           </div>
 
           {/* MailerLite Embedded Form */}
-          <div id="mlb2-30465305" className="ml-form-embedContainer ml-subscribe-form ml-subscribe-form-30465305">
-            <div className="ml-form-align-center">
-              <div className="ml-form-embedWrapper embedForm">
-                <div className="ml-form-embedBody ml-form-embedBodyDefault row-form">
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <input type="hidden" name="ml-submit" value="1" />
-                    <input type="hidden" name="anticsrf" value="true" />
-                    <div>
-                      <input
-                        type="email"
-                        name="fields[email]"
-                        placeholder="Enter your email address"
-                        required
-                        className="w-full px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
-                      />
-                    </div>
-                    <div className="ml-form-embedSubmit">
-                      <button type="submit" className="primary">Get Early Access</button>
-                      <button disabled style={{display: 'none'}} type="button" className="loading">
-                        <div className="ml-form-embedSubmitLoad"></div>
-                        <span className="sr-only">Loading...</span>
-                      </button>
-                    </div>
-                  </form>
-                </div>
-                <div className="ml-form-successBody row-success" style={{display: 'none'}}>
+          <div className="ml-embedded" data-form="0WPiC"></div>
                   <div className="ml-form-successContent">
                     <h4 className="text-white text-xl font-semibold mb-2">Thank you!</h4>
                     <p className="text-purple-200">You have successfully joined our subscriber list.</p>
