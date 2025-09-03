@@ -85,24 +85,6 @@ function App() {
             </div>
           </div>
 
-            {/* Fallback form while MailerLite loads */}
-            <div className="space-y-6">
-              <div className="relative">
-                <input
-                  type="email"
-                  placeholder="Enter your email address"
-                  className="w-full px-4 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition-all duration-300"
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full py-4 px-6 rounded-2xl font-semibold text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105"
-              >
-                Get Early Access
-              </button>
-            </div>
-
           {/* Social Proof */}
         </div>
 
