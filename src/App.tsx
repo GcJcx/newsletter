@@ -1,18 +1,60 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Zap } from 'lucide-react';
 
 function App() {
-  useEffect(() => {
-    // Ensure MailerLite script is loaded and form is rendered
-    const checkMailerLite = () => {
-      if (window.ml) {
-        window.ml('account', '1776947');
-      } else {
-        setTimeout(checkMailerLite, 100);
-      }
-    };
-    checkMailerLite();
-  }, []);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [email, setEmail] = useState('');
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    if (!email) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Create a hidden iframe to submit the form without leaving the page
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+      
+      // Create a form that targets the iframe
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = 'https://assets.mailerlite.com/jsonp/1776947/forms/164564835870180810/subscribe';
+      form.target = iframe.name = 'hidden-form-' + Date.now();
+      
+      // Add the email field
+      const emailField = document.createElement('input');
+      emailField.type = 'email';
+      emailField.name = 'fields[email]';
+      emailField.value = email;
+      form.appendChild(emailField);
+      
+      // Add required hidden fields
+      const mlSubmit = document.createElement('input');
+      mlSubmit.type = 'hidden';
+      mlSubmit.name = 'ml-submit';
+      mlSubmit.value = '1';
+      form.appendChild(mlSubmit);
+      
+      document.body.appendChild(form);
+      form.submit();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(form);
+        document.body.removeChild(iframe);
+      }, 1000);
+      
+      setIsSubmitted(true);
+    } catch (error) {
+      console.error('Subscription error:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 flex items-center justify-center p-4">
@@ -55,8 +97,43 @@ function App() {
             </p>
           </div>
 
-          {/* MailerLite Embedded Form */}
-          <div className="ml-embedded" data-form="0WPiC"></div>
+          {isSubmitted ? (
+            <div className="text-center">
+              <div className="bg-green-500/20 border border-green-500/30 rounded-2xl p-6 mb-4">
+                <h3 className="text-xl font-semibold text-white mb-2">Thank you!</h3>
+                <p className="text-green-200">You have successfully joined our subscriber list.</p>
+              </div>
+              <button
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setEmail('');
+                }}
+                className="text-purple-300 hover:text-white transition-colors duration-200 underline"
+              >
+                Subscribe another email
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email address"
+                  required
+                  className="w-full px-6 py-4 bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl text-white placeholder-purple-200 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent transition-all duration-300"
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-4 px-6 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {isSubmitting ? 'Joining...' : 'Get Early Access'}
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Footer */}
@@ -66,17 +143,6 @@ function App() {
           </p>
         </div>
       </div>
-
-      {/* MailerLite Success Script */}
-      <script dangerouslySetInnerHTML={{
-        __html: `
-          function ml_webform_success_30465305() {
-            var $ = ml_jQuery || jQuery;
-            $('.ml-subscribe-form-30465305 .row-success').show();
-            $('.ml-subscribe-form-30465305 .row-form').hide();
-          }
-        `
-      }} />
     </div>
   );
 }
